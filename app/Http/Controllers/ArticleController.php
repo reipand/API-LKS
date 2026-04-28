@@ -28,7 +28,7 @@ class ArticleController extends Controller
                 'categories.slug as category_slug',
                 'articles.author',
                 'articles.views',
-                DB::raw("strftime('%Y-%m-%d', articles.published_at) as published_at")
+                DB::raw("DATE(articles.published_at) as published_at")
             )
             ->whereNotNull('articles.published_at');
 
@@ -76,7 +76,7 @@ class ArticleController extends Controller
                 'categories.name as category',
                 'articles.author',
                 'articles.views',
-                DB::raw("strftime('%Y-%m-%d', articles.published_at) as published_at")
+                DB::raw("DATE(articles.published_at) as published_at")
             )
             ->where('articles.slug', $slug)
             ->first();
@@ -127,7 +127,7 @@ class ArticleController extends Controller
                 'articles.excerpt',
                 'articles.image_url',
                 'categories.name as category_name',
-                DB::raw("strftime('%Y-%m-%d', articles.published_at) as published_at")
+                DB::raw("DATE(articles.published_at) as published_at")
             )
             ->where('articles.category_id', $article->category_id)
             ->where('articles.id', '!=', $id)
@@ -157,7 +157,7 @@ class ArticleController extends Controller
                 'articles.image_url',
                 'categories.name as category_name',
                 'articles.views',
-                DB::raw("strftime('%Y-%m-%d', articles.published_at) as published_at")
+                DB::raw("DATE(articles.published_at) as published_at")
             )
             ->whereNotNull('articles.published_at')
             ->orderByDesc('articles.views')

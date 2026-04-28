@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Article;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +20,7 @@ class HomeController extends Controller
                 'articles.slug',
                 'articles.image_url',
                 'categories.name as category_name',
-                DB::raw("strftime('%Y-%m-%d', articles.published_at) as published_at")
+                DB::raw("DATE(articles.published_at) as published_at")
             )
             ->whereNotNull('articles.published_at')
             ->orderByDesc('articles.published_at')
@@ -63,7 +62,7 @@ class HomeController extends Controller
                     'articles.image_url',
                     'categories.name as category_name',
                     'articles.author',
-                    DB::raw("strftime('%Y-%m-%d', articles.published_at) as published_at")
+                    DB::raw("DATE(articles.published_at) as published_at")
                 )
                 ->whereNotNull('articles.published_at')
                 ->orderByDesc('articles.published_at')
@@ -84,7 +83,7 @@ class HomeController extends Controller
                     'articles.image_url',
                     'categories.name as category_name',
                     'articles.author',
-                    DB::raw("strftime('%Y-%m-%d', articles.published_at) as published_at")
+                    DB::raw("DATE(articles.published_at) as published_at")
                 )
                 ->whereIn('articles.category_id', $categoryIds)
                 ->when($bookmarkedIds->isNotEmpty(), fn($q) => $q->whereNotIn('articles.id', $bookmarkedIds))
