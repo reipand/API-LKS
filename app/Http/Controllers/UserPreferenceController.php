@@ -42,13 +42,22 @@ class UserPreferenceController extends Controller
             return response()->json(['success' => false, 'message' => 'user_id is required', 'data' => []], 422);
         }
 
-        $preferences = DB::table('user_category_preferences')
-            ->join('categories', 'user_category_preferences.category_id', '=', 'categories.id')
-            ->select('categories.id', 'categories.name', 'categories.slug')
-            ->where('user_category_preferences.user_id', $userId)
-            ->orderBy('categories.name')
-            ->get();
+        $preferredIds = DB::table('user_category_preferences')
+            ->where('user_id', $userId)
+            ->pluck('category_id')
+            ->toArray();
 
-        return response()->json(['success' => true, 'message' => 'Success', 'data' => $preferences]);
+        $categories = DB::table('categories')
+            ->select('id', 'name', 'slug')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($cat) => (object) [
+                'id'           => $cat->id,
+                'name'         => $cat->name,
+                'slug'         => $cat->slug,
+                'is_preferred' => in_array($cat->id, $preferredIds),
+            ]);
+
+        return response()->json(['success' => true, 'message' => 'Success', 'data' => $categories]);
     }
 }
