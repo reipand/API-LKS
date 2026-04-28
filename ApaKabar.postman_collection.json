@@ -1,0 +1,449 @@
+{
+  "info": {
+    "name": "ApaKabar API",
+    "description": "RESTful API — ApaKabar mobile-first online media platform.\n\nBase URL: {{base_url}}\n\nStandard response envelope:\n```json\n{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": {},\n  \"meta\": {}\n}\n```",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api-lks.reip.my.id/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Home",
+      "item": [
+        {
+          "name": "Breaking News",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/home/breaking?limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["home", "breaking"],
+              "query": [
+                { "key": "limit", "value": "5", "description": "Max articles (default: 5)" }
+              ]
+            },
+            "description": "Latest published articles sorted by published_at DESC. Used for breaking news banner."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"title\": \"AI Revolution Reshapes the Tech Industry\",\n      \"slug\": \"ai-revolution-reshapes-tech-industry\",\n      \"image_url\": \"https://picsum.photos/seed/ai/800/400\",\n      \"category_name\": \"Technology\",\n      \"published_at\": \"2026-04-28\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Recommendation (Personalized)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/home/recommendation?user_id={{user_id}}&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["home", "recommendation"],
+              "query": [
+                { "key": "user_id", "value": "{{user_id}}", "description": "Required. User ID." },
+                { "key": "limit", "value": "10", "description": "Max articles (default: 10)" }
+              ]
+            },
+            "description": "Personalized articles based on user_category_preferences. Excludes already-bookmarked articles. Falls back to latest if no preferences set."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"id\": 2,\n      \"title\": \"New Startup Raises $50M in Series B Funding\",\n      \"slug\": \"new-startup-raises-50m-series-b\",\n      \"excerpt\": \"A local startup disrupts logistics with drone delivery.\",\n      \"image_url\": \"https://picsum.photos/seed/startup/800/400\",\n      \"category_name\": \"Technology\",\n      \"author\": \"John Doe\",\n      \"published_at\": \"2026-04-27\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "422 Missing user_id",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"user_id is required\",\n  \"data\": []\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Discover",
+      "item": [
+        {
+          "name": "List Articles (Search + Filter + Pagination)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/articles?search=&category=&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["articles"],
+              "query": [
+                { "key": "search",   "value": "",   "description": "Optional. Search in title + excerpt (LIKE)." },
+                { "key": "category", "value": "",   "description": "Optional. Category slug, e.g. technology." },
+                { "key": "page",     "value": "1",  "description": "Page number (default: 1)." },
+                { "key": "limit",    "value": "10", "description": "Items per page (default: 10, max: 50)." }
+              ]
+            },
+            "description": "Paginated article list. Supports search (debounce on frontend) and category filter. `has_more: true` signals more pages for infinite scroll."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 10,\n    \"has_more\": false\n  },\n  \"data\": [\n    {\n      \"id\": 1,\n      \"title\": \"AI Revolution Reshapes the Tech Industry\",\n      \"slug\": \"ai-revolution-reshapes-tech-industry\",\n      \"excerpt\": \"How artificial intelligence is fundamentally changing how software is built.\",\n      \"image_url\": \"https://picsum.photos/seed/ai/800/400\",\n      \"category_name\": \"Technology\",\n      \"category_slug\": \"technology\",\n      \"author\": \"Jane Smith\",\n      \"views\": 5420,\n      \"published_at\": \"2026-04-28\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/categories",
+              "host": ["{{base_url}}"],
+              "path": ["categories"]
+            },
+            "description": "All categories sorted alphabetically. Used for dynamic filter chips on Discover screen."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": [\n    { \"id\": 5, \"name\": \"Business\",   \"slug\": \"business\" },\n    { \"id\": 4, \"name\": \"Health\",     \"slug\": \"health\" },\n    { \"id\": 2, \"name\": \"Politics\",   \"slug\": \"politics\" },\n    { \"id\": 3, \"name\": \"Sports\",     \"slug\": \"sports\" },\n    { \"id\": 1, \"name\": \"Technology\", \"slug\": \"technology\" },\n    { \"id\": 6, \"name\": \"World\",      \"slug\": \"world\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Article Detail",
+      "item": [
+        {
+          "name": "Get Article by Slug",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/articles/ai-revolution-reshapes-tech-industry",
+              "host": ["{{base_url}}"],
+              "path": ["articles", "ai-revolution-reshapes-tech-industry"]
+            },
+            "description": "Full article detail including content and tags array."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"id\": 1,\n    \"title\": \"AI Revolution Reshapes the Tech Industry\",\n    \"slug\": \"ai-revolution-reshapes-tech-industry\",\n    \"excerpt\": \"How artificial intelligence is fundamentally changing how software is built.\",\n    \"content\": \"Artificial intelligence is no longer a futuristic concept...\",\n    \"image_url\": \"https://picsum.photos/seed/ai/800/400\",\n    \"category\": \"Technology\",\n    \"author\": \"Jane Smith\",\n    \"views\": 5421,\n    \"published_at\": \"2026-04-28\",\n    \"tags\": [\"AI\", \"Startup\"]\n  }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Article not found\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Related Articles",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/articles/1/related?limit=3",
+              "host": ["{{base_url}}"],
+              "path": ["articles", "1", "related"],
+              "query": [
+                { "key": "limit", "value": "3", "description": "Max results (default: 3, max: 10)." }
+              ]
+            },
+            "description": "Articles from the same category, excluding current article, sorted by latest."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"id\": 2,\n      \"title\": \"New Startup Raises $50M in Series B Funding\",\n      \"slug\": \"new-startup-raises-50m-series-b\",\n      \"excerpt\": \"A local startup disrupts logistics with drone delivery.\",\n      \"image_url\": \"https://picsum.photos/seed/startup/800/400\",\n      \"category_name\": \"Technology\",\n      \"published_at\": \"2026-04-27\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Bookmark",
+      "item": [
+        {
+          "name": "Get Bookmarks",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/bookmarks?user_id={{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["bookmarks"],
+              "query": [
+                { "key": "user_id", "value": "{{user_id}}", "description": "Required." }
+              ]
+            },
+            "description": "All bookmarked articles for a user, ordered by most recently bookmarked."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"title\": \"AI Revolution Reshapes the Tech Industry\",\n      \"slug\": \"ai-revolution-reshapes-tech-industry\",\n      \"excerpt\": \"How artificial intelligence is fundamentally changing how software is built.\",\n      \"image_url\": \"https://picsum.photos/seed/ai/800/400\",\n      \"category_name\": \"Technology\",\n      \"author\": \"Jane Smith\",\n      \"published_at\": \"2026-04-28\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "422 Missing user_id",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"user_id is required\",\n  \"data\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add Bookmark",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept",       "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"article_id\": 10\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/bookmarks",
+              "host": ["{{base_url}}"],
+              "path": ["bookmarks"]
+            },
+            "description": "Add article to bookmark. Returns 409 if already bookmarked (UNIQUE constraint prevents duplicates)."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Bookmark added\"\n}"
+            },
+            {
+              "name": "409 Already Bookmarked",
+              "status": "Conflict",
+              "code": 409,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Article already bookmarked\"\n}"
+            },
+            {
+              "name": "404 Article Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Article not found\"\n}"
+            },
+            {
+              "name": "422 Missing Fields",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"user_id and article_id are required\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove Bookmark",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept",       "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"article_id\": 10\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/bookmarks",
+              "host": ["{{base_url}}"],
+              "path": ["bookmarks"]
+            },
+            "description": "Remove a bookmark. Returns 404 if not found."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Bookmark removed\"\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Bookmark not found\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Settings",
+      "item": [
+        {
+          "name": "Save Category Preferences",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept",       "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"categories\": [1, 2, 3]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/user/preferences/categories",
+              "host": ["{{base_url}}"],
+              "path": ["user", "preferences", "categories"]
+            },
+            "description": "Replace all category preferences for a user. Invalid IDs are silently ignored."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Preferences saved\",\n  \"data\": { \"saved\": 3 }\n}"
+            },
+            {
+              "name": "422 Invalid Body",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"categories must be a non-empty array\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Category Preferences",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/user/preferences/categories?user_id={{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["user", "preferences", "categories"],
+              "query": [
+                { "key": "user_id", "value": "{{user_id}}", "description": "Required." }
+              ]
+            },
+            "description": "Get saved category preferences for a user, sorted alphabetically."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": [\n    { \"id\": 2, \"name\": \"Politics\",   \"slug\": \"politics\" },\n    { \"id\": 3, \"name\": \"Sports\",     \"slug\": \"sports\" },\n    { \"id\": 1, \"name\": \"Technology\", \"slug\": \"technology\" }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bonus",
+      "item": [
+        {
+          "name": "Trending Articles",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/articles/trending?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["articles", "trending"],
+              "query": [
+                { "key": "limit", "value": "10", "description": "Max results (default: 10, max: 50)." }
+              ]
+            },
+            "description": "Articles sorted by views DESC. Used for trending/popular section."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"id\": 4,\n      \"title\": \"National Team Qualifies for World Cup\",\n      \"slug\": \"national-team-qualifies-world-cup\",\n      \"excerpt\": \"Indonesia books their spot in the 2026 World Cup finals.\",\n      \"image_url\": \"https://picsum.photos/seed/football/800/400\",\n      \"category_name\": \"Sports\",\n      \"views\": 12500,\n      \"published_at\": \"2026-04-26\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Increment View Count",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/articles/1/view",
+              "host": ["{{base_url}}"],
+              "path": ["articles", "1", "view"]
+            },
+            "description": "Increment view counter by 1. Call when user opens article detail."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"message\": \"View recorded\",\n  \"data\": { \"views\": 5422 }\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Article not found\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
