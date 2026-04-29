@@ -89,7 +89,7 @@ class HomeController extends Controller
                 ->when($bookmarkedIds->isNotEmpty(), fn($q) => $q->whereNotIn('articles.id', $bookmarkedIds))
                 ->whereNotNull('articles.published_at')
                 ->distinct()
-                ->orderByDesc(DB::raw('DATE(articles.published_at)'))
+                ->orderByDesc('published_at')
                 ->limit($limit)
                 ->get();
         }

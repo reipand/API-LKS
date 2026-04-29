@@ -265,15 +265,15 @@ class ArticleTest extends TestCase
             ->assertJsonPath('success', false);
     }
 
-    public function test_increment_view_is_throttled_after_10_requests(): void
+    public function test_increment_view_allows_repeated_requests(): void
     {
         $category = Category::factory()->create();
-        $article  = Article::factory()->create(['category_id' => $category->id]);
+        $article  = Article::factory()->create(['category_id' => $category->id, 'views' => 0]);
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $this->postJson("/api/v1/articles/{$article->id}/view")->assertOk();
         }
 
-        $this->postJson("/api/v1/articles/{$article->id}/view")->assertStatus(429);
+        $this->assertDatabaseHas('articles', ['id' => $article->id, 'views' => 20]);
     }
 }
