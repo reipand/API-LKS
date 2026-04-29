@@ -79,6 +79,7 @@ class ArticleController extends Controller
                 DB::raw("DATE(articles.published_at) as published_at")
             )
             ->where('articles.slug', $slug)
+            ->whereNotNull('articles.published_at')
             ->first();
 
         if (!$article) {

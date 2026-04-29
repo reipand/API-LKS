@@ -18,7 +18,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/articles', [ArticleController::class, 'index']);
     Route::get('/articles/{slug}', [ArticleController::class, 'show'])->where('slug', '[a-z0-9\-]+');
     Route::get('/articles/{id}/related', [ArticleController::class, 'related'])->where('id', '[0-9]+');
-    Route::post('/articles/{id}/view', [ArticleController::class, 'incrementView'])->where('id', '[0-9]+')->middleware('throttle:article-view');
+    Route::post('/articles/{id}/view', [ArticleController::class, 'incrementView'])->where('id', '[0-9]+');
 
     // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
